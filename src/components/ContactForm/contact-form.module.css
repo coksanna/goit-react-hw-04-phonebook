@@ -1,0 +1,35 @@
+.wrapper {
+  width: 400px;
+  padding: 15px;
+}
+
+.title {
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+}
+
+.formGroup {
+  display: flex;
+  justify-content: space-between;
+}
+
+.formInput {
+  width: 250px;
+}
+
+.formBtn {
+  border: 1px solid green;
+  border-radius: 3px;
+  color: green;
+}
+
+.message {
+  text-align: center;
+  color: green;
+}
