@@ -12,25 +12,33 @@ export const App = () => {
     const contacts = JSON.parse(localStorage.getItem('contacts'));
     return contacts ? contacts : [];
   });
-
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
     localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
 
+  const isDublicate = name => {
+    const normalizedName = name.toLowerCase();
+    const result = contacts.find(({ name }) => {
+      return name.toLowerCase() === normalizedName;
+    });
+
+    return Boolean(result);
+  };
+
   const addContact = ({ name, number }) => {
-    if (isDublicate(name, number)) {
+    if (isDublicate(name)) {
       alert(`Contact ${name} - is already in contacts`);
       return false;
     }
     setContacts(prevContacts => {
-      const newContact = {
+      const newContacts = {
         id: nanoid(),
         name,
         number,
       };
-      return { contacts: [newContact, ...prevContacts] };
+      return [newContacts, ...prevContacts];
     });
     return true;
   };
@@ -42,15 +50,6 @@ export const App = () => {
   };
 
   const handleFilter = ({ target }) => setFilter(target.value);
-
-  const isDublicate = name => {
-    const normalizedName = name.toLowerCase();
-    const result = contacts.find(({ name }) => {
-      return name.toLowerCase() === normalizedName;
-    });
-
-    return Boolean(result);
-  };
 
   const getFilteredContacts = () => {
     if (!filter) {

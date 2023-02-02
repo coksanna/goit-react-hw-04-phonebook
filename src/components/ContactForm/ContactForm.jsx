@@ -36,7 +36,6 @@ const ContactForm = ({ onSubmit }) => {
           name="name"
           value={name}
           placeholder="name"
-          id={this.nameInputId}
           pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
           title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
           required
