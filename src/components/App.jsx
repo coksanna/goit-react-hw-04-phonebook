@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 
 import ContactList from './ContactList/ContactList';
@@ -7,66 +7,52 @@ import ContactForm from './ContactForm/ContactForm';
 
 import css from './ContactForm/contact-form.module.css';
 
-export class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-  };
-
-  componentDidMount() {
+export const App = () => {
+  const [contacts, setContacts] = useState(() => {
     const contacts = JSON.parse(localStorage.getItem('contacts'));
-    if (contacts?.length) {
-      this.setState({ contacts });
-    }
-  }
+    return contacts ? contacts : [];
+  });
 
-  componentDidUpdate(prevProps, prevState) {
-    const { contacts } = this.state;
-    if (prevState.contacts.length !== contacts.length) {
-      localStorage.setItem('contacts', JSON.stringify(contacts));
-    }
-  }
+  const [filter, setFilter] = useState('');
 
-  addContact = ({ name, number }) => {
-    if (this.isDublicate(name, number)) {
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
+  const addContact = ({ name, number }) => {
+    if (isDublicate(name, number)) {
       alert(`Contact ${name} - is already in contacts`);
       return false;
     }
-    this.setState(prevState => {
-      const { contacts } = prevState;
-      const newContacts = {
+    setContacts(prevContacts => {
+      const newContact = {
         id: nanoid(),
         name,
         number,
       };
-      return { contacts: [newContacts, ...contacts] };
+      return { contacts: [newContact, ...prevContacts] };
     });
     return true;
   };
 
-  removeContact = id => {
-    this.setState(({ contacts }) => {
-      const newContacts = contacts.filter(contact => contact.id !== id);
-      return { contacts: newContacts };
-    });
+  const removeContact = id => {
+    setContacts(prevContacts =>
+      prevContacts.filter(contact => contact.id !== id)
+    );
   };
 
-  handleFilter = ({ target }) => {
-    this.setState({ filter: target.value });
-  };
+  const handleFilter = ({ target }) => setFilter(target.value);
 
-  isDublicate(name) {
+  const isDublicate = name => {
     const normalizedName = name.toLowerCase();
-    const { contacts } = this.state;
     const result = contacts.find(({ name }) => {
       return name.toLowerCase() === normalizedName;
     });
 
     return Boolean(result);
-  }
+  };
 
-  getFilteredContacts() {
-    const { filter, contacts } = this.state;
+  const getFilteredContacts = () => {
     if (!filter) {
       return contacts;
     }
@@ -77,28 +63,28 @@ export class App extends Component {
     });
 
     return result;
-  }
+  };
 
-  render() {
-    const { addContact, removeContact } = this;
-    const contacts = this.getFilteredContacts();
-    const isContacts = Boolean(contacts.length);
+  const filteredContacts = getFilteredContacts();
+  const isContacts = Boolean(contacts.length);
 
-    return (
-      <>
-        <div className={css.wrapper}>
-          <h2 className={css.title}>Phonebook</h2>
-          <ContactForm onSubmit={addContact} />
-        </div>
-        <div className={css.wrapper}>
-          <h2 className={css.title}>Contacts</h2>
-          <Filter handleChange={this.handleFilter} />
-          {isContacts && (
-            <ContactList removeContact={removeContact} contacts={contacts} />
-          )}
-          {!isContacts && <p className={css.message}>No contacts in list</p>}
-        </div>
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <div className={css.wrapper}>
+        <h2 className={css.title}>Phonebook</h2>
+        <ContactForm onSubmit={addContact} />
+      </div>
+      <div className={css.wrapper}>
+        <h2 className={css.title}>Contacts</h2>
+        <Filter handleChange={handleFilter} />
+        {isContacts && (
+          <ContactList
+            removeContact={removeContact}
+            contacts={filteredContacts}
+          />
+        )}
+        {!isContacts && <p className={css.message}>No contacts in list</p>}
+      </div>
+    </>
+  );
+};
